@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/styles/globals.css">
+    <link rel="stylesheet" href="src/styles/index.css">
+    <title>Image Uploader</title>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="left-content">
+            <h1>Image Uploader</h1>
+            <form method="post" id="formConfig" enctype="multipart/form-data">
+                <input type="file" name="imagem" id="imagem" required>
+                <button type="submit">Salvar Imagem</button>
+            </form>
+        </div>
+
+        <div class="right-content">
+            <h2>Imagens Salvas</h2>
+            <div id="image-list">
+                <!-- Uploaded images will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="src/scripts/script.js"></script>
+</body>
+</html>

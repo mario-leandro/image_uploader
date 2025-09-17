@@ -1,0 +1,14 @@
+.container {
+    display: flex;
+    padding: 20px;
+}
+
+.left-content, .right-content {
+    flex: 1;
+    padding: 20px;
+}
+
+input, button {
+    display: block;
+    margin: 10px 0;
+}
