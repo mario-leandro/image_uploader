@@ -11,17 +11,18 @@
     
     <div class="container">
         <div class="left-content">
-            <h1>Image Uploader</h1>
+            <h2>Upload de Imagem</h2>
             <form method="post" id="formConfig" enctype="multipart/form-data">
                 <input type="file" name="imagem" id="imagem" required>
-                <button type="submit">Salvar Imagem</button>
             </form>
         </div>
 
         <div class="right-content">
             <h2>Imagens Salvas</h2>
-            <div id="image-list">
-                <!-- Uploaded images will be displayed here -->
+            <div id="salvar-imagem">
+                <div id="imagem-carregada"></div>
+
+                <button id="btnSalvar">Salvar Imagem</button>
             </div>
         </div>
     </div>

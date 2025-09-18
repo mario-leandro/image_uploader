@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__ . '/../api/commun.php';
+include __DIR__ . '/../api/common.php';
 
 function getConnectionDB() {
     try {
@@ -12,6 +12,6 @@ function getConnectionDB() {
         );
         return $db;
     } catch(PDOException $e) {
-        json_response(500, ["success" => false, "message" => "Erro ao conectar ao banco: " . $e->getMessage()]);
+        resposta(500, ["success" => false, "message" => "Erro ao conectar ao banco: " . $e->getMessage()]);
     }
 }

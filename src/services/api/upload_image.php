@@ -3,26 +3,24 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include __DIR__ . '/commun.php';
+include __DIR__ . '/common.php';
 
 if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === 0) {
     $uploadDir = __DIR__ . "/../../assets/imagens_salvas/";
 
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
-    }
-
     $filename = uniqid() . "-" . basename($_FILES["imagem"]["name"]);
     $targetFile = $uploadDir . $filename;
 
-    // Valida se é imagem
-    $check = getimagesize($_FILES["imagem"]["tmp_name"]);
-    if ($check === false) {
-        json_response(400, ["success" => false, "error" => "Arquivo não é uma imagem"]);
-        exit;
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $_FILES['imagem']['tmp_name']);
+    finfo_close($finfo);
+
+    $tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif'];
+
+    if (!in_array($mimeType, $tiposPermitidos)) {
+        resposta(400, ["success" => false, "error" => "Arquivo não é uma imagem válida"]);
     }
 
-    // Move arquivo
     if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $targetFile)) {
         $url = "src/assets/imagens_salvas/" . $filename;
 
@@ -37,10 +35,10 @@ if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === 0) {
 
         $stmt->execute($arr_img);
 
-        json_response(201, ["success" => true, "url" => $url]);
+        resposta(201, ["success" => true, "url" => $url]);
     } else {
-        json_response(500, ["success" => false, "error" => "Falha ao salvar arquivo"]);
+        resposta(500, ["success" => false, "error" => "Falha ao salvar arquivo"]);
     }
 } else {
-    json_response(400, ["success" => false, "error" => "Nenhum arquivo enviado"]);
+    resposta(400, ["success" => false, "error" => "Nenhum arquivo enviado"]);
 }

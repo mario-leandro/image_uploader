@@ -5,7 +5,7 @@ function headers() {
     header('Access-Control-Allow-Origin: *');
 }
 
-function json_response(int $status, array $message) {
+function resposta(int $status, array $message) {
     http_response_code($status);
     echo json_encode($message);
     exit;

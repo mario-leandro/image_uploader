@@ -1,12 +1,34 @@
-const form = document.getElementById("formConfig");
-const lista_imagens = document.getElementById("image-list");
+const btnSalvar = document.getElementById("btnSalvar");
+const imagemCarregada = document.getElementById("imagem-carregada");
+const inputImagem = document.getElementById("imagem");
 
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+let imagemSelecionada = null;
 
-    const fileInput = document.getElementById("imagem");
+btnSalvar.style.display = "none";
+
+inputImagem.addEventListener("change", () => {
+    if (inputImagem.files && inputImagem.files[0]) {
+        imagemSelecionada = inputImagem.files[0];
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            imagemCarregada.innerHTML = `
+                <img src="${e.target.result}" alt="Imagem carregada" style="width: 300px; height: 300px;" />
+            `;
+        };
+        reader.readAsDataURL(imagemSelecionada);
+        btnSalvar.style.display = "block";
+    }
+});
+
+btnSalvar.addEventListener("click", async () => {
+    if (!imagemSelecionada) {
+        alert("Nenhuma imagem selecionada para salvar.");
+        return;
+    }
+
     const formData = new FormData();
-    formData.append("imagem", fileInput.files[0]);
+    formData.append("imagem", imagemSelecionada);
 
     try {
         const response = await fetch("./src/services/api/upload_image.php", {
@@ -14,17 +36,16 @@ form.addEventListener("submit", async (e) => {
             body: formData
         });
 
-        const result = await response.json();
+        const data = await response.json();
 
-        if (result.success) {
-            lista_imagens.innerHTML += `
-                <p>Upload realizado!</p>
-                <img src="${result.url}" alt="Imagem enviada">
-            `;
+        if (data.success) {
+            imagemCarregada.innerHTML = `<p style="color:green;">Imagem salva com sucesso!</p>`;
+            btnSalvar.style.display = "none";
+            imagemSelecionada = null;
         } else {
-            lista_imagens.innerHTML = `<p style="color:red;">Erro: ${result.error}</p>`;
+            imagemCarregada.innerHTML = `<p style="color:red;">Erro ao salvar a imagem.</p>`;
         }
     } catch (error) {
-        lista_imagens.innerHTML = `<p style="color:red;">Falha na requisição.</p>`;
+        imagemCarregada.innerHTML = `<p style="color:red;">Falha na requisição.</p>`;
     }
 });
