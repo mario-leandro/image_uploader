@@ -10,7 +10,6 @@ if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === 0) {
     $nomeArquivo = $_FILES["imagem"]["name"];
     $caminhoDestino = $pastaUploads . $nomeArquivo;
 
-    // Verificação de tipo de arquivo com Fileinfo
     $infoArquivo = finfo_open(FILEINFO_MIME_TYPE);
     $tipoMime = finfo_file($infoArquivo, $_FILES['imagem']['tmp_name']);
     finfo_close($infoArquivo);
@@ -21,11 +20,9 @@ if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === 0) {
         resposta(400, ["success" => false, "error" => "Arquivo não é uma imagem válida"]);
     }
 
-    // Movendo arquivo
     if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $caminhoDestino)) {
         $urlArquivo = "src/assets/imagens_salvas/" . $nomeArquivo;
-
-        // Conexão com o banco
+        
         $db_connection = getConnectionDB();
 
         $sql = $db_connection->prepare(
