@@ -4,38 +4,42 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 include __DIR__ . '/common.php';
-
 if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === 0) {
-    $uploadDir = __DIR__ . "/../../assets/imagens_salvas/";
+    $pastaUploads = __DIR__ . "/../../assets/imagens_salvas/";
 
-    $filename = uniqid() . "-" . basename($_FILES["imagem"]["name"]);
-    $targetFile = $uploadDir . $filename;
+    $nomeArquivo = $_FILES["imagem"]["name"];
+    $caminhoDestino = $pastaUploads . $nomeArquivo;
 
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mimeType = finfo_file($finfo, $_FILES['imagem']['tmp_name']);
-    finfo_close($finfo);
+    // Verificação de tipo de arquivo com Fileinfo
+    $infoArquivo = finfo_open(FILEINFO_MIME_TYPE);
+    $tipoMime = finfo_file($infoArquivo, $_FILES['imagem']['tmp_name']);
+    finfo_close($infoArquivo);
 
-    $tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif'];
+    $tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
 
-    if (!in_array($mimeType, $tiposPermitidos)) {
+    if (!in_array($tipoMime, $tiposPermitidos)) {
         resposta(400, ["success" => false, "error" => "Arquivo não é uma imagem válida"]);
     }
 
-    if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $targetFile)) {
-        $url = "src/assets/imagens_salvas/" . $filename;
+    // Movendo arquivo
+    if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $caminhoDestino)) {
+        $urlArquivo = "src/assets/imagens_salvas/" . $nomeArquivo;
 
-        // Insere no banco
-        $db = getConnectionDB();
+        // Conexão com o banco
+        $db_connection = getConnectionDB();
 
-        $stmt = $db->prepare("INSERT INTO uploads (filename, filepath) VALUES (:filename, :filepath)");
-        $arr_img = [
-            ":filename" => $filename,
-            ":filepath" => $url
+        $sql = $db_connection->prepare(
+            "INSERT INTO uploads (nome_arquivo, caminho_arquivo) VALUES (:nome, :caminho)"
+        );
+
+        $dadosArquivo = [
+            ":nome"   => $nomeArquivo,
+            ":caminho" => $urlArquivo
         ];
 
-        $stmt->execute($arr_img);
+        $sql->execute($dadosArquivo);
 
-        resposta(201, ["success" => true, "url" => $url]);
+        resposta(201, ["success" => true, "url" => $urlArquivo]);
     } else {
         resposta(500, ["success" => false, "error" => "Falha ao salvar arquivo"]);
     }
